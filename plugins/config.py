@@ -1,4 +1,4 @@
-import os
+,import os
 from os import environ, getenv
 import logging
 
@@ -36,7 +36,7 @@ class Config(object):
     LOG_CHANNEL = int(os.environ.get("LOG_CHANNEL", "-1002527626629"))
     LOGGER = logging
     OWNER_ID = int(os.environ.get("OWNER_ID", "7364852621"))
-    SESSION_NAME = "UploaderXNTBot"
+    SESSION_NAME = "Synthex_Sx_Bot"
     UPDATES_CHANNEL = os.environ.get("UPDATES_CHANNEL", "-1002644970737")
 
     TG_MIN_FILE_SIZE = 2194304000
