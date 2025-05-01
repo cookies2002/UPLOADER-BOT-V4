@@ -29,20 +29,24 @@ def DetectFileSize(url):
     return total_size
 
 
-def DownLoadFile(url, file_name, chunk_size, client=None, ud_type="", message_id=None, chat_id=None):
-    """
-    Downloads a file either from an HTTP URL or a torrent/magnet link.
-    """
+def DownLoadFile(url, file_name, chunk_size, client, ud_type, message_id, chat_id):
     if os.path.exists(file_name):
         os.remove(file_name)
 
     if not url:
         return file_name
 
+    # Handle magnet links with libtorrent
     if url.startswith("magnet:"):
+        logger.info("Handling as magnet link")
         return download_torrent(url, file_name, client, ud_type, message_id, chat_id)
 
-    # For direct file download (HTTP or FTP)
+    # Handle HTTP/FTP links
+    if not url.startswith("http://") and not url.startswith("https://"):
+        logger.error(f"Unsupported URL scheme: {url}")
+        raise ValueError(f"Unsupported URL scheme: {url}")
+
+    # Proceed to download HTTP file
     r = requests.get(url, allow_redirects=True, stream=True)
     total_size = int(r.headers.get("content-length", 0))
     downloaded_size = 0
@@ -52,7 +56,7 @@ def DownLoadFile(url, file_name, chunk_size, client=None, ud_type="", message_id
             if chunk:
                 fd.write(chunk)
                 downloaded_size += len(chunk)
-            if client is not None and downloaded_size > 0:
+            if client is not None:
                 try:
                     client.edit_message_text(
                         chat_id,
