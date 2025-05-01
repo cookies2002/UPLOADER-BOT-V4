@@ -3,7 +3,7 @@
 
 import os
 from plugins.config import Config
-from pyrogram import Client as PyroClient  # avoid name conflict
+from pyrogram import Client as PyroClient
 
 if __name__ == "__main__":
 
@@ -12,15 +12,19 @@ if __name__ == "__main__":
 
     plugins = dict(root="plugins")
 
+    # Set up the proxy configuration with your credentials
     proxy = None
     if Config.HTTP_PROXY:
         proxy_host, proxy_port = Config.HTTP_PROXY.split(":")
         proxy = {
-            "scheme": "http",  # or "socks5" if your proxy is SOCKS
+            "scheme": "http",  # Use "socks5" if hide.me provides SOCKS proxy
             "hostname": proxy_host,
-            "port": int(proxy_port)
+            "port": int(proxy_port),
+            "username": "marwin04",  # Your hide.me username
+            "password": "Marwin2002@"  # Your hide.me password
         }
 
+    # Create the PyroClient (your bot client)
     app = PyroClient(
         name=Config.SESSION_NAME,
         bot_token=Config.BOT_TOKEN,
@@ -28,9 +32,10 @@ if __name__ == "__main__":
         api_hash=Config.API_HASH,
         sleep_threshold=300,
         plugins=plugins,
-        proxy=proxy
+        proxy=proxy  # Use the proxy configuration here
     )
 
     print("🎊 I AM ALIVE 🎊  • Support @NT_BOTS_SUPPORT")
 
-    app.run()  # This line should be properly indented
+    app.run()
+    
