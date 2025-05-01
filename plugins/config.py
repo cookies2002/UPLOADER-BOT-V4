@@ -38,7 +38,7 @@ class Config(object):
     LOGGER = logging
     OWNER_ID = int(os.environ.get("OWNER_ID", "7364852621"))
     SESSION_NAME = "Synthex_Sx_Bot"
-    UPDATES_CHANNEL = os.environ.get("UPDATES_CHANNEL", "-1002644970737")
+    UPDATES_CHANNEL = os.environ.get("UPDATES_CHANNEL", "-1002556283391")
 
     TG_MIN_FILE_SIZE = 4294967296  # 4GB for userbot
     BOT_USERNAME = os.environ.get("BOT_USERNAME", "@Synthex_Sx_Bot")
