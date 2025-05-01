@@ -8,6 +8,7 @@ logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+
 def humanbytes(byte_size):
     """
     Converts byte size to a human-readable format.
@@ -18,6 +19,7 @@ def humanbytes(byte_size):
         byte_size /= 1024.0
     return "%3.1f PB" % byte_size
 
+
 def DetectFileSize(url):
     """
     Detects the size of a file via HTTP request headers.
@@ -26,7 +28,8 @@ def DetectFileSize(url):
     total_size = int(r.headers.get("content-length", 0))
     return total_size
 
-def DownLoadFile(url, file_name, chunk_size, client, ud_type, message_id, chat_id):
+
+def DownLoadFile(url, file_name, chunk_size, client=None, ud_type="", message_id=None, chat_id=None):
     """
     Downloads a file either from an HTTP URL or a torrent/magnet link.
     """
@@ -49,49 +52,52 @@ def DownLoadFile(url, file_name, chunk_size, client, ud_type, message_id, chat_i
             if chunk:
                 fd.write(chunk)
                 downloaded_size += len(chunk)
-            if client is not None:
-                if ((total_size // downloaded_size) % 5) == 0:
-                    time.sleep(0.3)
-                    try:
-                        client.edit_message_text(
-                            chat_id,
-                            message_id,
-                            text="{}: {} of {}".format(
-                                ud_type,
-                                humanbytes(downloaded_size),
-                                humanbytes(total_size)
-                            )
+            if client is not None and downloaded_size > 0:
+                try:
+                    client.edit_message_text(
+                        chat_id,
+                        message_id,
+                        text="{}: {} of {}".format(
+                            ud_type,
+                            humanbytes(downloaded_size),
+                            humanbytes(total_size)
                         )
-                    except:
-                        pass
+                    )
+                except:
+                    pass
     return file_name
 
-def download_torrent(magnet_link, file_name, client, ud_type, message_id, chat_id):
+
+def download_torrent(magnet_link, file_name, client=None, ud_type="", message_id=None, chat_id=None):
     """
     Downloads a torrent from a magnet link.
     """
     ses = lt.session()
+    ses.listen_on(6881, 6891)
+
     params = {
         'save_path': os.path.dirname(file_name),
-        'storage_mode': lt.storage_mode_t(2)  # Use file storage mode
+        'storage_mode': lt.storage_mode_t.storage_mode_sparse
     }
-    handle = ses.add_magnet_uri(magnet_link, params)
 
+    handle = lt.add_magnet_uri(ses, magnet_link, params)
     logger.info(f"Downloading torrent: {magnet_link}")
 
+    print("Fetching metadata...")
     while not handle.has_metadata():
         time.sleep(1)
         logger.info("Waiting for metadata...")
 
-    total_size = handle.get_torrent_info().total_size()
+    info = handle.get_torrent_info()
+    total_size = info.total_size()
     downloaded_size = 0
 
-    logger.info(f"Starting download...")
+    logger.info(f"Starting torrent download...")
 
-    while handle.status().state != lt.torrent_status.seeding:
+    while not handle.is_seed():
         status = handle.status()
-        downloaded_size = status.total_download
-        logger.info(f"Download speed: {status.download_rate / 1000} kB/s, "
+        downloaded_size = status.total_done
+        logger.info(f"Download speed: {status.download_rate / 1000:.2f} kB/s, "
                     f"Downloaded: {humanbytes(downloaded_size)} of {humanbytes(total_size)}")
 
         if client is not None:
