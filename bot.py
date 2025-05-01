@@ -3,7 +3,6 @@
 
 import os
 from plugins.config import Config
-from pyrogram.types import Proxy
 from pyrogram import Client as PyroClient  # avoid name conflict
 
 if __name__ == "__main__":
