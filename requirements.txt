@@ -24,4 +24,4 @@ lk21
 pytube
 flask
 gunicorn==20.1.0
-python-libtorrent
+python-libtorrent==2.0.5
