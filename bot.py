@@ -20,9 +20,9 @@ if __name__ == "__main__":
     sleep_threshold=300,
     plugins=plugins,
     proxy=dict(
-        hostname=Config.HTTP_PROXY.split("//")[-1].split(":")[0],
-        port=int(Config.HTTP_PROXY.split(":")[-1])
-    ) if Config.HTTP_PROXY else None
+    hostname=Config.HTTP_PROXY.split(":")[0],
+    port=int(Config.HTTP_PROXY.split(":")[1])
+) if Config.HTTP_PROXY else None
 )
 
     print("🎊 I AM ALIVE 🎊  • Support @NT_BOTS_SUPPORT")
